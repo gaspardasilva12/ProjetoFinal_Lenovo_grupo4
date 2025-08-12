@@ -1,0 +1,238 @@
+/* Footer Styles - Lenovo Design */
+
+.lenovo-footer {
+    background: #f8f9fa;
+    border-top: 1px solid #e0e0e0;
+    margin-top: 60px;
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 40px;
+}
+
+.footer-section h3 {
+    color: #333;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e60012;
+}
+
+.footer-section ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-section ul li {
+    margin-bottom: 12px;
+}
+
+.footer-section ul li a {
+    color: #666;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.2s ease;
+    display: block;
+    padding: 4px 0;
+}
+
+.footer-section ul li a:hover {
+    color: #e60012;
+}
+
+/* Newsletter */
+.footer-newsletter {
+    margin-bottom: 20px;
+}
+
+.newsletter-form {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.newsletter-form input {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.9rem;
+}
+
+.newsletter-form input:focus {
+    outline: none;
+    border-color: #e60012;
+}
+
+.newsletter-form button {
+    padding: 10px 16px;
+    background: #e60012;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.newsletter-form button:hover {
+    background: #cc0010;
+}
+
+/* Social Media */
+.footer-social {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.footer-social a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: #333;
+    color: white;
+    border-radius: 50%;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.footer-social a:hover {
+    background: #e60012;
+    transform: translateY(-2px);
+}
+
+.footer-social svg {
+    font-size: 1.1rem;
+}
+
+/* Contact Info */
+.footer-contact p {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.footer-contact svg {
+    color: #e60012;
+    font-size: 1rem;
+}
+
+.footer-contact strong {
+    color: #333;
+    font-weight: 600;
+}
+
+/* Footer Bottom */
+.footer-bottom {
+    background: #333;
+    color: white;
+    padding: 20px 0;
+    border-top: 1px solid #e0e0e0;
+}
+
+.footer-bottom-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.footer-bottom p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #ccc;
+}
+
+.footer-links {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.footer-links a {
+    color: #ccc;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.2s;
+}
+
+.footer-links a:hover {
+    color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .footer-content {
+        grid-template-columns: 1fr;
+        gap: 30px;
+        padding: 30px 15px;
+    }
+    
+    .footer-section h3 {
+        font-size: 1rem;
+    }
+    
+    .newsletter-form {
+        flex-direction: column;
+    }
+    
+    .newsletter-form button {
+        width: 100%;
+    }
+    
+    .footer-bottom-content {
+        flex-direction: column;
+        text-align: center;
+        padding: 0 15px;
+    }
+    
+    .footer-links {
+        justify-content: center;
+        gap: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .footer-content {
+        padding: 20px 10px;
+    }
+    
+    .footer-section h3 {
+        font-size: 0.95rem;
+    }
+    
+    .footer-section ul li a {
+        font-size: 0.85rem;
+    }
+    
+    .footer-social {
+        gap: 10px;
+    }
+    
+    .footer-social a {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .footer-social svg {
+        font-size: 1rem;
+    }
+}

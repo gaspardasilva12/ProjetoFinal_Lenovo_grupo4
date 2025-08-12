@@ -1,0 +1,168 @@
+.solutions-container,
+.solutions-detail-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.solutions-hero,
+.solution-hero {
+    text-align: center;
+    padding: 40px 20px;
+    background: #f5f5f5;
+    margin-bottom: 30px;
+}
+
+.solution-hero-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.solution-icon {
+    font-size: 50px;
+    color: #e60012;
+    margin-bottom: 20px;
+}
+
+.solutions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.solution-card {
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 20px;
+    transition: transform 0.2s;
+    text-decoration: none;
+    color: inherit;
+}
+
+.solution-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.solution-card-icon {
+    font-size: 30px;
+    color: #e60012;
+    margin-bottom: 15px;
+}
+
+.solution-card-arrow {
+    color: #e60012;
+    font-size: 20px;
+    text-align: right;
+    margin-top: 15px;
+}
+
+.solutions-cta {
+    text-align: center;
+    padding: 30px;
+    background: #f9f9f9;
+    border-radius: 8px;
+}
+
+.cta-button {
+    background: #e60012;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 15px;
+}
+
+.solution-tabs {
+    display: flex;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 20px;
+}
+
+.solution-tabs button {
+    padding: 10px 20px;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+}
+
+.solution-tabs button.active {
+    border-bottom-color: #e60012;
+    font-weight: bold;
+}
+
+.tab-content {
+    padding: 20px 0;
+}
+
+.overview-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.overview-card {
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.feature-card {
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.feature-icon {
+    color: #e60012;
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.use-cases-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.use-case-card {
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.contact-content {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.contact-methods {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin: 30px 0;
+}
+
+.contact-method {
+    flex: 1;
+    max-width: 200px;
+}
+
+.contact-btn {
+    background: #e60012;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 4px;
+    cursor: pointer;
+}
