@@ -45,7 +45,8 @@ const Home = () => {
             image: "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
             buttonText: "Saiba Mais",
             link: "/sustentabilidade"
-        }
+        },
+        
     ];
 
     return (
@@ -61,6 +62,7 @@ const Home = () => {
                         {exploreCategories.map((category, index) => (
                             <Link key={index} to={category.link} className="explore-item">
                                 <div className="explore-icon">
+                                    <category.icon size={40} />
                                     <category.icon />
                                 </div>
                                 <span>{category.name}</span>
