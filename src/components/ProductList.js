@@ -1,7 +1,91 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { produtosAPI } from '../services/api';
 
-const ProductList = ({ products }) => {
+const ProductList = ({ products: externalProducts }) => {
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+                
+                // Se produtos externos forem passados, usá-los; caso contrário, obter da API
+                if (externalProducts && externalProducts.length > 0) {
+                    setProducts(externalProducts);
+                } else {
+                    const data = await produtosAPI.getAll();
+                    // Mapear os dados da API para o formato esperado pelo componente
+                    const mappedProducts = data.map(product => ({
+                        id: product.id,
+                        name: product.nome,
+                        description: product.nome, // A API não tem descrição separada
+                        price: product.preco,
+                        image: product.imagens && product.imagens.length > 0 ? product.imagens[0].url : '/images/placeholder.jpg',
+                        categoriaId: product.categoriaId
+                    }));
+                    setProducts(mappedProducts);
+                }
+            } catch (err) {
+                console.error('Erro ao carregar produtos:', err);
+                setError('Erro ao carregar os produtos. Por favor, tente novamente.');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProducts();
+    }, [externalProducts]);
+
+    if (loading) {
+        return (
+            <div style={{ 
+                display: 'flex', 
+                justifyContent: 'center', 
+                alignItems: 'center', 
+                height: '200px',
+                fontSize: '1.2rem',
+                color: '#666'
+            }}>
+Carregando produtos...
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div style={{ 
+                display: 'flex', 
+                justifyContent: 'center', 
+                alignItems: 'center', 
+                height: '200px',
+                fontSize: '1.2rem',
+                color: '#e60012',
+                textAlign: 'center',
+                padding: '20px'
+            }}>
+                {error}
+            </div>
+        );
+    }
+
+    if (products.length === 0) {
+        return (
+            <div style={{ 
+                display: 'flex', 
+                justifyContent: 'center', 
+                alignItems: 'center', 
+                height: '200px',
+                fontSize: '1.2rem',
+                color: '#666'
+            }}>
+Nenhum produto encontrado.
+            </div>
+        );
+    }
     return (
         <div style={{ 
             display: 'grid',
