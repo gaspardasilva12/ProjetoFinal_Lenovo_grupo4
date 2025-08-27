@@ -1,4 +1,4 @@
-// Serviço API para conectar com a API REST TOTI
+// O serviço de api para se conectar com a API REST TOTI
 const API_BASE_URL = 'https://backend-toti.onrender.com';
 
 // Função auxiliar para tratar respostas da API
