@@ -1,6 +1,9 @@
+# PROJETO DO GRUPO 4
 # Lenovo Clone - Site Oficial
 
 Este é um clone do site oficial da Lenovo Brasil, desenvolvido com React e focado em recriar a experiência de compra e navegação do site original.
+<img width="1000" alt="Toti banner" src="https://drive.google.com/file/d/1H1pgpqumF7AaC2et5pnYtm4YZbsTMkYM/view?usp=sharing" />
+
 ## 🚀 Funcionalidades
 
 ### HeroBanner Aprimorado
