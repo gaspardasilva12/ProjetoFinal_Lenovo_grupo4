@@ -55,7 +55,6 @@ const post = async (endpoint, data, token = null) => {
   }
 };
 
-
 // Função auxiliar para fazer requisições PUT
 const put = async (endpoint, data, token = null) => {
   try {
@@ -136,7 +135,6 @@ export const categoriasAPI = {
   create: (categoria) => post('/categorias', categoria),
   update: (id, categoria) => put(`/categorias/${id}`, categoria),
   delete: (id) => del(`/categorias/${id}`),
-
 };
 
 // API de Produtos
@@ -211,23 +209,7 @@ export const authAPI = {
   login: (credentials) => post('/auth/login', credentials),
   register: (userData) => post('/auth/register', userData),
   logout: (token) => post('/auth/logout', {}, token),
-
-  // Versão segura: busca no parâmetro ou no localStorage; não lança exceção — retorna null se não houver token
-  refreshToken: async (refreshToken) => {
-    const tokenToUse = refreshToken || localStorage.getItem('refreshToken');
-    if (!tokenToUse) {
-      console.warn('Refresh token não disponível');
-      // Retorna null para que o chamador possa tratar (ex.: redirecionar ao login)
-      return null;
-    }
-    try {
-      return await post('/auth/refresh', { refreshToken: tokenToUse });
-    } catch (error) {
-      console.error('Erro ao atualizar refresh token:', error);
-      throw error;
-    }
-  },
-
+  refreshToken: (refreshToken) => post('/auth/refresh', { refreshToken }),
   forgotPassword: (email) => post('/auth/forgot-password', { email }),
   resetPassword: (token, newPassword) => post('/auth/reset-password', { token, newPassword }),
   changePassword: (currentPassword, newPassword, token) => post('/auth/change-password', { currentPassword, newPassword }, token),
@@ -274,7 +256,6 @@ export const notificacoesAPI = {
   updatePreferences: (preferences, token) => patch('/notificacoes/preferences', preferences, token),
   getPreferences: (token) => get('/notificacoes/preferences', token),
 };
-
 
 // API de Suporte
 export const suporteAPI = {

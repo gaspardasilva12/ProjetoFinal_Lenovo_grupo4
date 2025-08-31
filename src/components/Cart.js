@@ -17,9 +17,8 @@ const Cart = () => {
         clearError 
     } = useCart();
     const { addToWishlist, isInWishlist, removeFromWishlist } = useWishlist();
-    const [isUpdating, setIsUpdating] = useState({});
+    const [isUpdating, setIsUpdating] = useState(false);
     const [isMovingToWishlist, setIsMovingToWishlist] = useState({});
-    const [localError, setLocalError] = useState(null);
 
     const subtotal = getCartTotal();
     const shipping = subtotal > 500 ? 0 : 29.99;
@@ -33,27 +32,22 @@ const Cart = () => {
     };
 
     const handleQuantityUpdate = async (productId, newQuantity) => {
-        setIsUpdating(prev => ({ ...prev, [productId]: true }));
-        setLocalError(null);
-        
-        try {
-            if (newQuantity <= 0) {
-                await removeFromCart(productId);
-            } else {
+        if (newQuantity <= 0) {
+            await removeFromCart(productId);
+        } else {
+            setIsUpdating(true);
+            try {
                 await updateQuantity(productId, newQuantity);
+            } catch (error) {
+                console.error('Erro ao atualizar quantidade:', error);
+            } finally {
+                setIsUpdating(false);
             }
-        } catch (error) {
-            console.error('Erro ao atualizar quantidade:', error);
-            setLocalError(`Erro ao atualizar quantidade: ${error.message}`);
-        } finally {
-            setIsUpdating(prev => ({ ...prev, [productId]: false }));
         }
     };
 
     const handleMoveToWishlist = async (item) => {
         setIsMovingToWishlist(prev => ({ ...prev, [item.id]: true }));
-        setLocalError(null);
-        
         try {
             await removeFromCart(item.id);
             if (!isInWishlist(item.id)) {
@@ -61,29 +55,16 @@ const Cart = () => {
             }
         } catch (error) {
             console.error('Erro ao mover para wishlist:', error);
-            setLocalError(`Erro ao mover para lista de desejos: ${error.message}`);
         } finally {
             setIsMovingToWishlist(prev => ({ ...prev, [item.id]: false }));
         }
     };
 
     const handleClearCart = async () => {
-        setLocalError(null);
         try {
             await clearCart();
         } catch (error) {
             console.error('Erro ao limpar carrinho:', error);
-            setLocalError(`Erro ao limpar carrinho: ${error.message}`);
-        }
-    };
-
-    const handleRemoveFromCart = async (productId) => {
-        setLocalError(null);
-        try {
-            await removeFromCart(productId);
-        } catch (error) {
-            console.error('Erro ao remover do carrinho:', error);
-            setLocalError(`Erro ao remover item: ${error.message}`);
         }
     };
 
@@ -152,16 +133,6 @@ const Cart = () => {
                 </div>
             </div>
 
-            {localError && (
-                <div className="cart-local-error">
-                    <FaExclamationTriangle className="error-icon" />
-                    <span>{localError}</span>
-                    <button onClick={() => setLocalError(null)} className="btn-dismiss">
-                        ×
-                    </button>
-                </div>
-            )}
-
             <div className="cart-content">
                 <div className="cart-main">
                     <div className="cart-items">
@@ -177,7 +148,7 @@ const Cart = () => {
                             <div key={item.id} className="cart-item">
                                 <div className="cart-item-image">
                                     <img 
-                                        src={item.imagem || item.image || '/images/placeholder.jpg'} 
+                                        src={item.imagem || item.image} 
                                         alt={item.nome || item.name}
                                         onError={(e) => {
                                             e.target.src = '/images/placeholder.jpg';
@@ -211,7 +182,7 @@ const Cart = () => {
                                     <div className="quantity-controls">
                                         <button
                                             onClick={() => handleQuantityUpdate(item.id, (item.quantidade || item.quantity) - 1)}
-                                            disabled={isUpdating[item.id]}
+                                            disabled={isUpdating}
                                             className="quantity-btn"
                                         >
                                             <FaMinus />
@@ -221,13 +192,13 @@ const Cart = () => {
                                         </span>
                                         <button
                                             onClick={() => handleQuantityUpdate(item.id, (item.quantidade || item.quantity) + 1)}
-                                            disabled={isUpdating[item.id]}
+                                            disabled={isUpdating}
                                             className="quantity-btn"
                                         >
                                             <FaPlus />
                                         </button>
                                     </div>
-                                    {isUpdating[item.id] && <FaSpinner className="spinner small" />}
+                                    {isUpdating && <FaSpinner className="spinner small" />}
                                 </div>
                                 
                                 <div className="cart-item-total">
@@ -236,7 +207,7 @@ const Cart = () => {
                                 
                                 <div className="cart-item-actions">
                                     <button
-                                        onClick={() => handleRemoveFromCart(item.id)}
+                                        onClick={() => removeFromCart(item.id)}
                                         disabled={loading}
                                         className="btn-remove"
                                         title="Remover do carrinho"

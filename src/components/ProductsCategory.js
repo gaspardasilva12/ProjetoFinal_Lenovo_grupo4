@@ -17,48 +17,48 @@ const ProductsCategory = () => {
   const [error, setError] = useState(null);
 
   // Carregar categorias e produtos
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                setLoading(true);
-                setError(null);
-                
-                // Carregar todas as categorias
-                const categoriesData = await categoriasAPI.getAll();
-                setCategories(categoriesData);
-                
-                // Carregar todos os produtos
-                const productsData = await produtosAPI.getAll();
-                
-                // Se há um parâmetro de categoria, filtrar produtos por categoria
-                if (categoryParam) {
-                    // Buscar a categoria por nome ou ID
-                    const category = categoriesData.find(cat => 
-                        cat.nome.toLowerCase().replace(/\s+/g, '-') === categoryParam.toLowerCase() ||
-                        cat.id.toString() === categoryParam
-                    );
-                    
-                    if (category) {
-                        setCurrentCategory(category);
-                        const filteredProducts = productsData.filter(product => 
-                            product.categoriaId === category.id
-                        );
-                        setProducts(filteredProducts);
-                    } else {
-                        setProducts([]);
-                        setError('Categoria não encontrada');
-                    }
-                } else {
-                    // Se não há parâmetro de categoria, mostrar todos os produtos
-                    setProducts(productsData);
-                }
-            } catch (err) {
-                console.error('Erro ao carregar dados:', err);
-                setError('Erro ao carregar os produtos. Por favor, tente novamente.');
-            } finally {
-                setLoading(false);
-            }
-        };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Carregar todas as categorias
+        const categoriesData = await categoriasAPI.getAll();
+        setCategories(categoriesData);
+
+        // Carregar todos os produtos
+        const productsData = await produtosAPI.getAll();
+
+        // Se há um parâmetro de categoria, filtrar produtos por categoria
+        if (categoryParam) {
+          // Buscar a categoria por nome ou ID
+          const category = categoriesData.find(cat =>
+            cat.nome.toLowerCase().replace(/\s+/g, '-') === categoryParam.toLowerCase() ||
+            cat.id.toString() === categoryParam
+          );
+
+          if (category) {
+            setCurrentCategory(category);
+            const filteredProducts = productsData.filter(product =>
+              product.categoriaId === category.id
+            );
+            setProducts(filteredProducts);
+          } else {
+            setProducts([]);
+            setError('Categoria não encontrada');
+          }
+        } else {
+          // Se não há parâmetro de categoria, mostrar todos os produtos
+          setProducts(productsData);
+        }
+      } catch (err) {
+        console.error('Erro ao carregar dados:', err);
+        setError('Erro ao carregar os produtos. Por favor, tente novamente.');
+      } finally {
+        setLoading(false);
+      }
+    };
 
     fetchData();
   }, [categoryParam]);
@@ -150,9 +150,9 @@ const ProductsCategory = () => {
       }}>
         <div className="sort-filter">
           <label htmlFor="sort">Ordenar por:</label>
-          <select 
+          <select
             id="sort"
-            value={sortBy} 
+            value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
             style={{
               marginLeft: '10px',
@@ -162,8 +162,8 @@ const ProductsCategory = () => {
             }}
           >
             <option value="name">Nome</option>
-             <option value="price-low">Preço: Menor para Maior</option>
-             <option value="price-high">Preço: Maior para Menor</option>
+            <option value="price-low">Preço: Menor para Maior</option>
+            <option value="price-high">Preço: Maior para Menor</option>
           </select>
         </div>
       </div>
@@ -196,8 +196,8 @@ const ProductsCategory = () => {
                 overflow: 'hidden'
               }}>
                 {product.imagens && product.imagens.length > 0 ? (
-                  <img 
-                    src={product.imagens[0].url} 
+                  <img
+                    src={product.imagens[0].url}
                     alt={product.nome}
                     style={{
                       maxWidth: '100%',
@@ -218,7 +218,7 @@ const ProductsCategory = () => {
                   Sem imagem
                 </div>
               </div>
-              
+
               <h3 style={{
                 margin: '0 0 12px',
                 fontSize: '1.1rem',
@@ -226,7 +226,7 @@ const ProductsCategory = () => {
               }}>
                 {product.nome}
               </h3>
-              
+
               <p style={{
                 margin: '0 0 16px',
                 fontSize: '1.2rem',
@@ -235,8 +235,8 @@ const ProductsCategory = () => {
               }}>
                 {formatPrice(product.preco)}
               </p>
-              
-              <button 
+
+              <button
                 onClick={() => addToCart({
                   id: product.id,
                   name: product.nome,
