@@ -1,5 +1,9 @@
-import React, { useState } from 'react';
-import { FaUser, FaHistory, FaHeart, FaCog, FaSignOutAlt } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import { FaUser, FaHistory, FaHeart, FaCog, FaSignOutAlt, FaEdit, FaTrash, FaEye, FaShoppingCart, FaShieldAlt, FaPlus, FaSearch, FaSpinner } from 'react-icons/fa';
+import { useAuth } from '../context/AuthContext';
+import { useOrders } from '../context/OrdersContext';
+import { useWishlist } from '../context/WishlistContext';
+import { produtoRegistroAPI } from '../services/api';
 import '../styles/Account.css';
 
 const TABS = [
@@ -35,31 +39,31 @@ const Account = () => {
             <InputField label="Telefone" id="phone" type="tel" defaultValue="(11) 99999-9999" required />
             <InputField label="CPF" id="cpf" defaultValue="123.456.789-00" required />
             <button type="submit" className="btn-primary">Salvar Alterações</button>
-        </form>
+                </form>
     );
 
     const renderOrders = () => (
-        <p>Você ainda não fez nenhum pedido.</p>
+                    <p>Você ainda não fez nenhum pedido.</p>
     );
 
     const renderWishlist = () => (
-        <p>Sua lista de desejos está vazia.</p>
+                    <p>Sua lista de desejos está vazia.</p>
     );
 
     const renderSettingsForm = () => (
         <form className="account-form">
-            <h3>Alterar Senha</h3>
+                <h3>Alterar Senha</h3>
             <InputField label="Senha Atual" id="currentPassword" type="password" required />
             <InputField label="Nova Senha" id="newPassword" type="password" required />
             <InputField label="Confirmar Nova Senha" id="confirmPassword" type="password" required />
 
-            <h3>Preferências de Comunicação</h3>
-            <label className="checkbox-label">
+                <h3>Preferências de Comunicação</h3>
+                    <label className="checkbox-label">
                 <input type="checkbox" /> Desejo receber ofertas e novidades por e-mail
-            </label>
+                    </label>
 
             <button type="submit" className="btn-primary">Salvar Configurações</button>
-        </form>
+            </form>
     );
 
     const renderActiveTabContent = () => {

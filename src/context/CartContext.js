@@ -1,56 +1,111 @@
-import React, { createContext, useContext, useReducer, useEffect, useState } from 'react';
-import { carrinhosAPI, clientesAPI } from '../services/api';
+import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import { carrinhosAPI } from '../services/api';
+import { useAuth } from './AuthContext';
 
 const CartContext = createContext();
 
 const cartReducer = (state, action) => {
     switch (action.type) {
-        case 'ADD_ITEM':
-            const existingItem = state.items.find(item => item.id === action.payload.id);
-            if (existingItem) {
-                return {
-                    ...state,
-                    items: state.items.map(item =>
-                        item.id === action.payload.id
-                            ? { ...item, quantity: item.quantity + 1 }
-                            : item
-                    )
-                };
-            } else {
-                return {
-                    ...state,
-                    items: [...state.items, { ...action.payload, quantity: 1 }]
-                };
-            }
-
-        case 'REMOVE_ITEM':
+        case 'FETCH_CART_START':
             return {
                 ...state,
-                items: state.items.filter(item => item.id !== action.payload)
+                loading: true,
+                error: null
             };
-
-        case 'UPDATE_QUANTITY':
+        case 'FETCH_CART_SUCCESS':
             return {
                 ...state,
-                items: state.items.map(item =>
-                    item.id === action.payload.id
-                        ? { ...item, quantity: action.payload.quantity }
-                        : item
-                )
+                loading: false,
+                items: action.payload,
+                error: null
             };
-
-        case 'CLEAR_CART':
+        case 'FETCH_CART_FAILURE':
             return {
                 ...state,
-                items: []
+                loading: false,
+                error: action.payload
             };
-
-        case 'SET_CART':
+        case 'ADD_ITEM_START':
             return {
                 ...state,
-                items: action.payload
+                loading: true,
+                error: null
             };
-
+        case 'ADD_ITEM_SUCCESS':
+            return {
+                ...state,
+                loading: false,
+                items: action.payload,
+                error: null
+            };
+        case 'ADD_ITEM_FAILURE':
+            return {
+                ...state,
+                loading: false,
+                error: action.payload
+            };
+        case 'REMOVE_ITEM_START':
+            return {
+                ...state,
+                loading: true,
+                error: null
+            };
+        case 'REMOVE_ITEM_SUCCESS':
+            return {
+                ...state,
+                loading: false,
+                items: action.payload,
+                error: null
+            };
+        case 'REMOVE_ITEM_FAILURE':
+            return {
+                ...state,
+                loading: false,
+                error: action.payload
+            };
+        case 'UPDATE_QUANTITY_START':
+            return {
+                ...state,
+                loading: true,
+                error: null
+            };
+        case 'UPDATE_QUANTITY_SUCCESS':
+            return {
+                ...state,
+                loading: false,
+                items: action.payload,
+                error: null
+            };
+        case 'UPDATE_QUANTITY_FAILURE':
+            return {
+                ...state,
+                loading: false,
+                error: action.payload
+            };
+        case 'CLEAR_CART_START':
+            return {
+                ...state,
+                loading: true,
+                error: null
+            };
+        case 'CLEAR_CART_SUCCESS':
+            return {
+                ...state,
+                loading: false,
+                items: [],
+                error: null
+            };
+        case 'CLEAR_CART_FAILURE':
+            return {
+                ...state,
+                loading: false,
+                error: action.payload
+            };
+        case 'CLEAR_ERROR':
+            return {
+                ...state,
+                error: null
+            };
         default:
             return state;
     }
@@ -58,261 +113,287 @@ const cartReducer = (state, action) => {
 
 const CartProvider = ({ children }) => {
     const [state, dispatch] = useReducer(cartReducer, {
-        items: []
+        loading: false,
+        items: [],
+        error: null
     });
-    const [clienteId, setClienteId] = useState(null);
-    const [carrinhoId, setCarrinhoId] = useState(null);
-    const [isOnline, setIsOnline] = useState(navigator.onLine);
-    const [syncPending, setSyncPending] = useState(false);
 
-    // Detectar mudanças na conectividade
+    const { isAuthenticated, user, getValidToken } = useAuth();
+
+    // Carregar carrinho quando o usuário estiver autenticado
     useEffect(() => {
-        const handleOnline = () => {
-            setIsOnline(true);
-            if (syncPending) {
-                syncCartWithAPI();
-            }
-        };
-        const handleOffline = () => setIsOnline(false);
+        if (isAuthenticated && user) {
+            fetchCart();
+        }
+    }, [isAuthenticated, user]);
 
-        window.addEventListener('online', handleOnline);
-        window.addEventListener('offline', handleOffline);
-
-        return () => {
-            window.removeEventListener('online', handleOnline);
-            window.removeEventListener('offline', handleOffline);
-        };
-    }, [syncPending]);
-
-    // Inicializar carrinho ao montar o componente
-    useEffect(() => {
-        initializeCart();
-    }, []);
-
-    const initializeCart = async () => {
+    // Função para buscar carrinho do usuário
+    const fetchCart = async () => {
         try {
-            // Carregar carrinho do localStorage primeiro
-            const savedCart = localStorage.getItem('lenovo-cart');
-            const savedClienteId = localStorage.getItem('lenovo-cliente-id');
-            const savedCarrinhoId = localStorage.getItem('lenovo-carrinho-id');
-
-            if (savedCart) {
-                try {
-                    const cartData = JSON.parse(savedCart);
-                    dispatch({ type: 'SET_CART', payload: cartData });
-                } catch (error) {
-                    console.error('Erro ao carregar carrinho do localStorage:', error);
-                }
-            }
-
-            if (savedClienteId) {
-                setClienteId(parseInt(savedClienteId));
-            }
-
-            if (savedCarrinhoId) {
-                setCarrinhoId(parseInt(savedCarrinhoId));
-            }
-
-            // Se estamos online, tentar sincronizar com a API
-            if (isOnline) {
-                await syncCartWithAPI();
-            }
+            dispatch({ type: 'FETCH_CART_START' });
+            
+            const token = await getValidToken();
+            const cartData = await carrinhosAPI.getByClienteId(user.id, token);
+            
+            // Converter dados da API para formato local
+            const cartItems = cartData.itens || [];
+            const formattedItems = cartItems.map(item => ({
+                id: item.produtoId,
+                nome: item.produto?.nome || 'Produto',
+                preco: item.produto?.preco || 0,
+                imagem: item.produto?.imagem || '/images/placeholder.jpg',
+                quantidade: item.quantidade,
+                categoria: item.produto?.categoria || 'Geral'
+            }));
+            
+            dispatch({
+                type: 'FETCH_CART_SUCCESS',
+                payload: formattedItems
+            });
         } catch (error) {
-            console.error('Erro ao inicializar carrinho:', error);
+            dispatch({
+                type: 'FETCH_CART_FAILURE',
+                payload: error.message
+            });
         }
     };
 
-    const syncCartWithAPI = async () => {
-        if (!isOnline) {
-            setSyncPending(true);
-            return;
+    // Função para adicionar item ao carrinho
+    const addToCart = async (productOrId, quantity = 1) => {
+        if (!productOrId) {
+            console.warn('addToCart chamado sem produto:', productOrId);
+            return { success: false, error: 'invalid_product' };
         }
 
-        try {
-            // Se não temos um cliente, criar um temporário
-            if (!clienteId) {
-                const newCliente = await clientesAPI.create({
-                    nome: 'Cliente Temporário',
-                    email: `temp_${Date.now()}@example.com`
-                });
-                setClienteId(newCliente.id);
-                localStorage.setItem('lenovo-cliente-id', newCliente.id.toString());
-            }
-
-            // Se temos itens no carrinho local mas não um carrinhoId, criar um novo
-            if (state.items.length > 0 && !carrinhoId) {
-                const cartItems = state.items.map(item => ({
-                    produtoId: item.id,
-                    quantidade: item.quantity
-                }));
-
-                const newCarrinho = await carrinhosAPI.create({
-                    clienteId: clienteId,
-                    itens: cartItems
-                });
-
-                setCarrinhoId(newCarrinho.id);
-                localStorage.setItem('lenovo-carrinho-id', newCarrinho.id.toString());
-            }
-
-            setSyncPending(false);
-        } catch (error) {
-            console.error('Erro ao sincronizar carrinho com API:', error);
-            setSyncPending(true);
-        }
-    };
-
-    // Save cart to localStorage whenever it changes
-    useEffect(() => {
-        localStorage.setItem('lenovo-cart', JSON.stringify(state.items));
-    }, [state.items]);
-
-    const addToCart = async (product) => {
-        // Adicionar ao estado local imediatamente
-        dispatch({ type: 'ADD_ITEM', payload: product });
-
-        // Tentar sincronizar com a API se estamos online
-        if (isOnline && clienteId) {
-            try {
-                if (carrinhoId) {
-                    // Atualizar carrinho existente
-                    const updatedItems = [...state.items];
-                    const existingItem = updatedItems.find(item => item.id === product.id);
-                    
-                    if (existingItem) {
-                        existingItem.quantity += 1;
-                    } else {
-                        updatedItems.push({ ...product, quantity: 1 });
-                    }
-
-                    const cartItems = updatedItems.map(item => ({
-                        produtoId: item.id,
-                        quantidade: item.quantity
-                    }));
-
-                    await carrinhosAPI.update(carrinhoId, {
-                        clienteId: clienteId,
-                        itens: cartItems
-                    });
-                } else {
-                    // Criar novo carrinho
-                    await syncCartWithAPI();
-                }
-            } catch (error) {
-                console.error('Erro ao adicionar ao carrinho API:', error);
-                setSyncPending(true);
-            }
+        let productId = null;
+        if (typeof productOrId === 'number' || typeof productOrId === 'string') {
+            productId = productOrId;
+        } else if (productOrId && (productOrId.id || productOrId.productId)) {
+            productId = productOrId.id || productOrId.productId;
         } else {
-            setSyncPending(true);
+            console.warn('addToCart recebeu objeto inválido:', productOrId);
+            return { success: false, error: 'invalid_product' };
+        }
+
+        const token = await getValidToken();
+        if (!token) {
+            console.warn('addToCart requer autenticação, token não disponível');
+            return { success: false, error: 'auth_required' };
+        }
+
+        try {
+            dispatch({ type: 'ADD_ITEM_START' });
+
+            // Chama a API para adicionar o item
+            await carrinhosAPI.addItem(user.id, {
+                produtoId: productId,
+                quantidade: quantity
+            });
+
+            // Busca o carrinho atualizado
+            await fetchCart();
+
+            dispatch({
+                type: 'ADD_ITEM_SUCCESS',
+                payload: state.items // O fetchCart já atualiza o estado
+            });
+
+            return { success: true, data: state.items };
+        } catch (err) {
+            dispatch({
+                type: 'ADD_ITEM_FAILURE',
+                payload: err.message
+            });
+            console.error('Falha ao adicionar ao carrinho:', err);
+            return { success: false, error: 'request_failed', details: err };
         }
     };
 
+    // Função para remover item do carrinho
     const removeFromCart = async (productId) => {
-        // Remover do estado local imediatamente
-        dispatch({ type: 'REMOVE_ITEM', payload: productId });
-
-        // Tentar sincronizar com a API se estamos online
-        if (isOnline && carrinhoId && clienteId) {
-            try {
-                const updatedItems = state.items.filter(item => item.id !== productId);
-                
-                if (updatedItems.length === 0) {
-                    // Se não restam itens, eliminar o carrinho
-                    await carrinhosAPI.delete(carrinhoId);
-                    setCarrinhoId(null);
-                    localStorage.removeItem('lenovo-carrinho-id');
-                } else {
-                    // Atualizar carrinho com itens restantes
-                    const cartItems = updatedItems.map(item => ({
-                        produtoId: item.id,
-                        quantidade: item.quantity
-                    }));
-
-                    await carrinhosAPI.update(carrinhoId, {
-                        clienteId: clienteId,
-                        itens: cartItems
-                    });
-                }
-            } catch (error) {
-                console.error('Erro ao remover do carrinho API:', error);
-                setSyncPending(true);
-            }
-        } else {
-            setSyncPending(true);
-        }
-    };
-
-    const updateQuantity = async (productId, quantity) => {
-        if (quantity <= 0) {
-            await removeFromCart(productId);
-        } else {
-            // Atualizar estado local imediatamente
-            dispatch({ type: 'UPDATE_QUANTITY', payload: { id: productId, quantity } });
-
-            // Tentar sincronizar com a API se estamos online
-            if (isOnline && carrinhoId && clienteId) {
-                try {
-                    const updatedItems = state.items.map(item =>
-                        item.id === productId ? { ...item, quantity } : item
-                    );
-
-                    const cartItems = updatedItems.map(item => ({
-                        produtoId: item.id,
-                        quantidade: item.quantity
-                    }));
-
-                    await carrinhosAPI.update(carrinhoId, {
-                        clienteId: clienteId,
-                        itens: cartItems
-                    });
-                } catch (error) {
-                    console.error('Erro ao atualizar quantidade no carrinho API:', error);
-                    setSyncPending(true);
-                }
+        try {
+            dispatch({ type: 'REMOVE_ITEM_START' });
+            
+            const token = await getValidToken();
+            const updatedItems = state.items.filter(item => item.id !== productId);
+            
+            if (updatedItems.length === 0) {
+                // Se não restam itens, limpar carrinho
+                await carrinhosAPI.delete(user.id, token);
+                dispatch({
+                    type: 'REMOVE_ITEM_SUCCESS',
+                    payload: []
+                });
             } else {
-                setSyncPending(true);
+                // Atualizar carrinho com itens restantes
+                const cartItems = updatedItems.map(item => ({
+                    produtoId: item.id,
+                    quantidade: item.quantidade
+                }));
+                
+                await carrinhosAPI.update(user.id, {
+                    clienteId: user.id,
+                    itens: cartItems
+                }, token);
+                
+                dispatch({
+                    type: 'REMOVE_ITEM_SUCCESS',
+                    payload: updatedItems
+                });
             }
+        } catch (error) {
+            dispatch({
+                type: 'REMOVE_ITEM_FAILURE',
+                payload: error.message
+            });
+            throw error;
         }
     };
 
+    // Função para atualizar quantidade
+    const updateQuantity = async (productId, quantity) => {
+        try {
+            if (quantity <= 0) {
+                await removeFromCart(productId);
+                return;
+            }
+            
+            dispatch({ type: 'UPDATE_QUANTITY_START' });
+            
+            const token = await getValidToken();
+            const updatedItems = state.items.map(item =>
+                item.id === productId ? { ...item, quantidade: quantity } : item
+            );
+            
+            const cartItems = updatedItems.map(item => ({
+                produtoId: item.id,
+                quantidade: item.quantidade
+            }));
+            
+            await carrinhosAPI.update(user.id, {
+                clienteId: user.id,
+                itens: cartItems
+            }, token);
+            
+            dispatch({
+                type: 'UPDATE_QUANTITY_SUCCESS',
+                payload: updatedItems
+            });
+        } catch (error) {
+            dispatch({
+                type: 'UPDATE_QUANTITY_FAILURE',
+                payload: error.message
+            });
+            throw error;
+        }
+    };
+
+    // Função para limpar carrinho
     const clearCart = async () => {
-        // Limpar estado local imediatamente
-        dispatch({ type: 'CLEAR_CART' });
-
-        // Tentar eliminar carrinho da API se estamos online
-        if (isOnline && carrinhoId) {
-            try {
-                await carrinhosAPI.delete(carrinhoId);
-                setCarrinhoId(null);
-                localStorage.removeItem('lenovo-carrinho-id');
-            } catch (error) {
-                console.error('Erro ao limpar carrinho API:', error);
-            }
+        try {
+            dispatch({ type: 'CLEAR_CART_START' });
+            
+            const token = await getValidToken();
+            await carrinhosAPI.delete(user.id, token);
+            
+            dispatch({
+                type: 'CLEAR_CART_SUCCESS'
+            });
+        } catch (error) {
+            dispatch({
+                type: 'CLEAR_CART_FAILURE',
+                payload: error.message
+            });
+            throw error;
         }
     };
 
+    // Função para obter total do carrinho
     const getCartTotal = () => {
         return state.items.reduce((total, item) => {
-            return total + item.price * item.quantity;
+            return total + (item.preco || 0) * item.quantidade;
         }, 0);
     };
 
+    // Função para obter contagem de itens
     const getCartCount = () => {
-        return state.items.reduce((count, item) => count + item.quantity, 0);
+        return state.items.reduce((count, item) => count + item.quantidade, 0);
+    };
+
+    // Função para limpar erro
+    const clearError = () => {
+        dispatch({ type: 'CLEAR_ERROR' });
+    };
+
+    // Função para obter estatísticas do carrinho
+    const getCartStats = () => {
+        const total = state.items.length;
+        const totalValue = getCartTotal();
+        const categories = [...new Set(state.items.map(item => item.categoria))];
+
+        return {
+            total,
+            totalValue,
+            categories: categories.length
+        };
+    };
+
+    // Função para verificar se item está no carrinho
+    const isInCart = (productId) => {
+        return state.items.some(item => item.id === productId);
+    };
+
+    // Função para obter item do carrinho
+    const getCartItem = (productId) => {
+        return state.items.find(item => item.id === productId);
+    };
+
+    // Função para aplicar cupom de desconto
+    const applyCoupon = async (couponCode) => {
+        try {
+            const token = await getValidToken();
+            // Implementar lógica de cupom quando a API estiver disponível
+            console.log('Aplicando cupom:', couponCode);
+            return { success: true, discount: 0.1 }; // 10% de desconto
+        } catch (error) {
+            throw new Error('Erro ao aplicar cupom');
+        }
+    };
+
+    // Função para calcular frete
+    const calculateShipping = async (zipCode) => {
+        try {
+            const token = await getValidToken();
+            // Implementar cálculo de frete quando a API estiver disponível
+            console.log('Calculando frete para CEP:', zipCode);
+            return { success: true, shipping: 15.90 }; // Frete fixo
+        } catch (error) {
+            throw new Error('Erro ao calcular frete');
+        }
     };
 
     const value = {
+        // Estado
         items: state.items,
+        loading: state.loading,
+        error: state.error,
+        
+        // Funções principais
+        fetchCart,
         addToCart,
         removeFromCart,
         updateQuantity,
         clearCart,
+        
+        // Funções auxiliares
         getCartTotal,
         getCartCount,
-        isOnline,
-        syncPending,
-        clienteId,
-        carrinhoId
+        clearError,
+        getCartStats,
+        isInCart,
+        getCartItem,
+        applyCoupon,
+        calculateShipping
     };
 
     return (

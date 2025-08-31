@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useCart } from '../context/CartContext';
+import { useWishlist } from '../context/WishlistContext';
 import { produtosAPI } from '../services/api';
+import { FaHeart, FaShoppingCart, FaEye } from 'react-icons/fa';
+import '../styles/ProductList.css';
 
 const ProductList = ({ products: externalProducts }) => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const { addToCart } = useCart();
+    const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -40,108 +46,106 @@ const ProductList = ({ products: externalProducts }) => {
         fetchProducts();
     }, [externalProducts]);
 
+    const handleAddToCart = (product) => {
+        addToCart({
+            ...product,
+            quantity: 1
+        });
+    };
+
+    const handleToggleWishlist = async (product) => {
+        if (isInWishlist(product.id)) {
+            await removeFromWishlist(product.id);
+        } else {
+            await addToWishlist(product);
+        }
+    };
+
     if (loading) {
         return (
-            <div style={{ 
-                display: 'flex', 
-                justifyContent: 'center', 
-                alignItems: 'center', 
-                height: '200px',
-                fontSize: '1.2rem',
-                color: '#666'
-            }}>
-Carregando produtos...
+            <div className="product-list-loading">
+                <div className="loading-spinner"></div>
+                <p>Carregando produtos...</p>
             </div>
         );
     }
 
     if (error) {
         return (
-            <div style={{ 
-                display: 'flex', 
-                justifyContent: 'center', 
-                alignItems: 'center', 
-                height: '200px',
-                fontSize: '1.2rem',
-                color: '#e60012',
-                textAlign: 'center',
-                padding: '20px'
-            }}>
-                {error}
+            <div className="product-list-error">
+                <p>{error}</p>
             </div>
         );
     }
 
     if (products.length === 0) {
         return (
-            <div style={{ 
-                display: 'flex', 
-                justifyContent: 'center', 
-                alignItems: 'center', 
-                height: '200px',
-                fontSize: '1.2rem',
-                color: '#666'
-            }}>
-Nenhum produto encontrado.
+            <div className="product-list-empty">
+                <p>Nenhum produto encontrado.</p>
             </div>
         );
     }
+
     return (
-        <div style={{ 
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
-            gap: '32px',
-            padding: '0 32px',
-            maxWidth: '1200px',
-            margin: '0 auto'
-        }}>
+        <div className="product-list-container">
             {products.map(product => (
-                <div key={product.id} style={{ 
-                    border: '1px solid #eee',
-                    borderRadius: '8px',
-                    padding: '16px',
-                    transition: 'transform 0.2s',
-                    ':hover': {
-                        transform: 'translateY(-4px)',
-                        boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-                    }
-                }}>
-                    <Link to={`/produto/${product.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                <div key={product.id} className="product-card">
+                    <div className="product-card-image">
                         <img 
                             src={product.image} 
-                            alt={product.name} 
-                            style={{ 
-                                width: '100%', 
-                                height: '200px',
-                                objectFit: 'contain',
-                                marginBottom: '16px'
-                            }} 
+                            alt={product.name}
+                            onError={(e) => {
+                                e.target.src = '/images/placeholder.jpg';
+                            }}
                         />
-                        <h3 style={{ margin: '0 0 8px' }}>{product.name}</h3>
-                        <p style={{ margin: '0 0 16px', color: '#666' }}>{product.description}</p>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ color: '#e60012', fontWeight: 'bold', fontSize: '1.2rem' }}>
-                                R$ {product.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                            </span>
-                            <button 
-                                style={{ 
-                                    background: '#e60012', 
-                                    color: '#fff', 
-                                    border: 'none', 
-                                    padding: '8px 16px', 
-                                    borderRadius: '4px', 
-                                    cursor: 'pointer',
-                                    fontSize: '0.9rem'
-                                }}
+                        
+                        {/* Botões de ação */}
+                        <div className="product-card-actions">
+                            <button
                                 onClick={(e) => {
-                                    e.preventDefault();
-                                    // Adicionar ao carrinho
+                                    e.stopPropagation();
+                                    handleToggleWishlist(product);
                                 }}
+                                className={`action-button wishlist-button ${isInWishlist(product.id) ? 'active' : ''}`}
+                                title={isInWishlist(product.id) ? 'Remover da Lista de Desejos' : 'Adicionar à Lista de Desejos'}
                             >
-                                Comprar
+                                <FaHeart />
                             </button>
                         </div>
-                    </Link>
+                    </div>
+                    
+                    <div className="product-card-content">
+                        <h3 className="product-card-title">
+                            {product.name}
+                        </h3>
+                        
+                        <p className="product-card-description">
+                            {product.description}
+                        </p>
+                        
+                        <div className="product-card-price">
+                            R$ {product.price.toFixed(2)}
+                        </div>
+                        
+                        <div className="product-card-buttons">
+                            <Link 
+                                to={`/produto/${product.id}`}
+                                className="view-details-button"
+                            >
+                                <FaEye /> Ver Detalhes
+                            </Link>
+                            
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleAddToCart(product);
+                                }}
+                                className="add-to-cart-button"
+                            >
+                                <FaShoppingCart /> Adicionar
+                            </button>
+                        </div>
+                    </div>
                 </div>
             ))}
         </div>

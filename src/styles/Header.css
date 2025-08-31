@@ -2,10 +2,10 @@
 .lenovo-logo-red {
     background: #e60012;
     color: white;
-    padding: 8px 16px;
+    padding: 8px 25px;
     border-radius: 0px;
     font-weight: bold;
-    font-size:13px;
+    font-size: 20px;
     font-family: Arial, sans-serif;
     letter-spacing: 0.5px;
     
@@ -92,21 +92,416 @@
     display: flex;
     align-items: center;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: all 0.2s ease;
     color: #333;
     font-size: 16px;
+    text-decoration: none;
+    border-radius: 4px;
+    position: relative;
 }
 
 .lenovo-account:hover,
 .lenovo-wishlist:hover,
 .lenovo-cart:hover {
     background-color: #f5f5f5;
+    color: #e60012;
 }
 
 .lenovo-account svg,
 .lenovo-wishlist svg,
 .lenovo-cart svg {
     font-size: 16px;
+}
+
+/* Dropdown de Conta */
+.lenovo-account-dropdown {
+    position: relative;
+}
+
+.lenovo-account {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: inherit;
+}
+
+.lenovo-account.active {
+    color: #e60012;
+    border-bottom: 2px solid #e60012;
+}
+
+.account-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 400px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    margin-top: 8px;
+    z-index: 1001;
+    overflow: hidden;
+    animation: dropdownFadeIn 0.3s ease;
+}
+
+@keyframes dropdownFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dropdown-header {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 24px;
+    text-align: center;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.dropdown-header h3 {
+    margin: 0 0 12px 0;
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.dropdown-header p {
+    margin: 0 0 20px 0;
+    color: #666;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.btn-login-create {
+    background: #000;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    min-width: 200px;
+}
+
+.btn-login-create:hover {
+    background: #333;
+}
+
+.dropdown-options {
+    padding: 16px 0;
+}
+
+.dropdown-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 16px 24px;
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.2s ease;
+    border-bottom: 1px solid #f0f0f0;
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: inherit;
+}
+
+.dropdown-option:last-child {
+    border-bottom: none;
+}
+
+.dropdown-option:hover {
+    background: #f8f9fa;
+}
+
+.dropdown-option.logout-option {
+    color: #e31e24;
+}
+
+.dropdown-option.logout-option:hover {
+    background: #fff5f5;
+}
+
+.option-icon {
+    width: 40px;
+    height: 40px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #e31e24;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.option-content h4 {
+    margin: 0 0 4px 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.option-content p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #666;
+    line-height: 1.3;
+}
+
+/* Modal de Autenticação */
+.auth-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 20px;
+}
+
+.auth-modal {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.auth-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 24px 0;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 20px;
+}
+
+.auth-modal-header h2 {
+    margin: 0;
+    color: #333;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.auth-modal-close {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: #666;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+}
+
+.auth-modal-close:hover {
+    background: #f5f5f5;
+    color: #333;
+}
+
+/* Erro de autenticação */
+.auth-error {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 12px 24px;
+    margin: 20px 24px 0;
+    border-radius: 6px;
+    border: 1px solid #f5c6cb;
+    font-size: 0.9rem;
+}
+
+/* Formulário de autenticação */
+.auth-form {
+    padding: 24px;
+}
+
+.auth-form .form-group {
+    margin-bottom: 20px;
+}
+
+.auth-form .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.auth-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #333;
+    font-size: 0.9rem;
+}
+
+.auth-form input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.auth-form input:focus {
+    outline: none;
+    border-color: #e31e24;
+    box-shadow: 0 0 0 3px rgba(227, 30, 36, 0.1);
+}
+
+.auth-form input::placeholder {
+    color: #999;
+}
+
+/* Campo de senha */
+.password-input {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: color 0.2s ease;
+}
+
+.password-toggle:hover {
+    color: #333;
+}
+
+/* Botão de submit */
+.btn-auth-submit {
+    width: 100%;
+    background: #e31e24;
+    color: white;
+    border: none;
+    padding: 14px 24px;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-auth-submit:hover:not(:disabled) {
+    background: #c41e3a;
+}
+
+.btn-auth-submit:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+/* Rodapé do formulário */
+.auth-form-footer {
+    text-align: center;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.auth-form-footer p {
+    margin: 0 0 12px 0;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.btn-auth-switch {
+    background: none;
+    border: none;
+    color: #e31e24;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.9rem;
+    text-decoration: underline;
+    transition: color 0.2s ease;
+}
+
+.btn-auth-switch:hover {
+    color: #c41e3a;
+}
+
+/* Spinner */
+.spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Contadores */
+.wishlist-count,
+.cart-count {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #e60012;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    min-width: 20px;
+}
+
+/* Texto desktop dos ícones */
+.desktop-text {
+    font-size: 12px;
+    font-weight: 500;
+    color: #333;
+    white-space: nowrap;
 }
 
 /* Navegação principal */
@@ -434,6 +829,10 @@
     .lenovo-nav-main {
         gap: 20px;
     }
+    
+    .account-dropdown {
+        width: 350px;
+    }
 }
 
 @media (max-width: 992px) {
@@ -495,6 +894,20 @@
     .lenovo-nav-secondary li:not(:last-child)::after {
         display: none;
     }
+    
+    .account-dropdown {
+        width: 300px;
+        right: -50px;
+    }
+    
+    .auth-modal {
+        max-width: 90vw;
+        margin: 20px;
+    }
+    
+    .auth-form .form-row {
+        grid-template-columns: 1fr;
+    }
 }
 
 @media (max-width: 768px) {
@@ -516,6 +929,45 @@
     .lenovo-wishlist,
     .lenovo-cart {
         padding: 6px 8px;
+    }
+    
+    .wishlist-count,
+    .cart-count {
+        width: 18px;
+        height: 18px;
+        font-size: 11px;
+        top: -6px;
+        right: -6px;
+    }
+    
+    .account-dropdown {
+        width: 280px;
+        right: -80px;
+    }
+    
+    .dropdown-header {
+        padding: 20px;
+    }
+    
+    .dropdown-header h3 {
+        font-size: 1.2rem;
+    }
+    
+    .dropdown-option {
+        padding: 14px 20px;
+    }
+    
+    .auth-modal {
+        max-width: 95vw;
+        margin: 10px;
+    }
+    
+    .auth-modal-header {
+        padding: 20px 20px 0;
+    }
+    
+    .auth-form {
+        padding: 20px;
     }
 }
 
@@ -539,5 +991,26 @@
 
     .lenovo-search button {
         padding: 0 12px;
+    }
+    
+    .account-dropdown {
+        width: 260px;
+        right: -100px;
+    }
+    
+    .auth-modal {
+        max-width: 100vw;
+        margin: 0;
+        border-radius: 0;
+        height: 100vh;
+        max-height: 100vh;
+    }
+    
+    .auth-modal-header {
+        padding: 16px 16px 0;
+    }
+    
+    .auth-form {
+        padding: 16px;
     }
 }
